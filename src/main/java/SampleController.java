@@ -6,22 +6,33 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import java.util.Collections;
 
 import java.util.Map;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.ObjectPostProcessor;
 
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.authentication.configurers.provisioning.InMemoryUserDetailsManagerConfigurer;
 
 
 @Controller
 @EnableAutoConfiguration
 public class SampleController {
 
+    @Bean
+    public AuthenticationManager authenticationManager(
+                    ObjectPostProcessor<Object> objectPostProcessor) throws Exception {
 
-  @Autowired
-  public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
-      auth.inMemoryAuthentication()
-              .withUser("client").password("secret").roles("USER");
-  }
+            InMemoryUserDetailsManagerConfigurer<AuthenticationManagerBuilder> builder = new AuthenticationManagerBuilder(
+                            objectPostProcessor).inMemoryAuthentication();
+            
+            builder
+                    .withUser("client")
+                    .password("secret")
+                    .roles( "USER" );
 
+            return builder.and().build();
+
+    }  
 
 
   @RequestMapping("/")
